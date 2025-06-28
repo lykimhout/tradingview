@@ -7,6 +7,7 @@ let isDrawingDown = false;
 
 let lastCandleTime = null;
 let priceSocket = null;
+let livePriceLine = null;
 
 function initChart() {
   document.getElementById("chart").innerHTML = "";
@@ -96,7 +97,6 @@ function drawIndicators(candles) {
   const selection = $("#indicator").val();
 
   if (selection === "ema+rsi") {
-    // === EMA ===
     const emaPeriod = 14;
     const emaData = [];
     let prevEma;
@@ -120,7 +120,6 @@ function drawIndicators(candles) {
     emaLine = chart.addLineSeries({ color: "#FFA500", lineWidth: 1.5 });
     emaLine.setData(emaData.filter(x => x !== null));
 
-    // === RSI ===
     const rsiValues = calculateRSI(candles, 14);
     const rsiContainer = document.createElement("div");
     rsiContainer.style.width = "100%";
@@ -257,8 +256,10 @@ function startRealTimePrice(symbol) {
     priceSocket = null;
   }
 
-  const proxyUrl = 'wss://binance-ws-proxy-zcno.onrender.com'; // <- Replace with your Render WebSocket URL
+  const proxyUrl = 'wss://binance-ws-proxy-zcno.onrender.com'; // 👈 Replace with your WebSocket proxy URL
   priceSocket = new WebSocket(proxyUrl);
+
+  let lastCandle = null;
 
   priceSocket.onopen = () => {
     priceSocket.send(symbol);
@@ -267,11 +268,34 @@ function startRealTimePrice(symbol) {
   priceSocket.onmessage = function (event) {
     const data = JSON.parse(event.data);
     const price = parseFloat(data.p);
+    const volume = parseFloat(data.q);
     const time = Math.floor(data.T / 1000);
 
-    candleSeries.update({
-      time: time,
-      close: price
+    if (!lastCandle || time > lastCandle.time) {
+      lastCandle = {
+        time: time,
+        open: price,
+        high: price,
+        low: price,
+        close: price,
+        volume: volume
+      };
+    } else {
+      lastCandle.close = price;
+      lastCandle.high = Math.max(lastCandle.high, price);
+      lastCandle.low = Math.min(lastCandle.low, price);
+      lastCandle.volume += volume;
+    }
+
+    candleSeries.update(lastCandle);
+
+    if (livePriceLine) candleSeries.removePriceLine(livePriceLine);
+    livePriceLine = candleSeries.createPriceLine({
+      price: price,
+      color: 'yellow',
+      lineStyle: 2,
+      axisLabelVisible: true,
+      title: 'Live'
     });
   };
 }
