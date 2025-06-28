@@ -52,7 +52,8 @@ function startRealTimePrice(symbol) {
     priceSocket = null;
   }
 
-  const proxyUrl = 'wss://binance-ws-proxy-zcno.onrender.com'; // ✅ updated
+  // Use your actual WebSocket proxy URL here
+  const proxyUrl = 'wss://binance-ws-proxy-me.onrender.com';
   priceSocket = new WebSocket(proxyUrl);
 
   priceSocket.onopen = () => {
