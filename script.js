@@ -8,17 +8,23 @@ const intervalMap = {
   '1d': '1d',
 };
 
+let fullCandles = [];
+let currentSymbol = 'BTCUSDT';
+let currentInterval = '1h';
+
 function initChart() {
   $('#chart').html('');
   $('#rsi-chart').html('');
+
   chart = LightweightCharts.createChart(document.getElementById('chart'), {
     layout: { backgroundColor: '#111', textColor: '#eee' },
-    grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' }},
+    grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
     timeScale: { timeVisible: true, secondsVisible: false },
   });
+
   rsiChart = LightweightCharts.createChart(document.getElementById('rsi-chart'), {
     layout: { backgroundColor: '#111', textColor: '#eee' },
-    grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' }},
+    grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
     timeScale: { timeVisible: true, secondsVisible: false },
   });
 
@@ -27,10 +33,14 @@ function initChart() {
   ma50_1 = chart.addLineSeries({ color: 'blue', lineWidth: 1 });
   ma50_2 = chart.addLineSeries({ color: 'blue', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted });
   rsiSeries = rsiChart.addLineSeries({ color: 'orange', lineWidth: 2 });
+
+  chart.timeScale().subscribeVisibleLogicalRangeChange(handleScroll);
 }
 
-async function fetchCandles(symbol, interval) {
-  const url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
+async function fetchCandles(symbol, interval, limit = 500, endTime = null, startTime = null) {
+  let url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+  if (endTime) url += `&endTime=${endTime}`;
+  if (startTime) url += `&startTime=${startTime}`;
   const response = await fetch(url);
   const data = await response.json();
   return data.map(d => ({
@@ -61,6 +71,7 @@ function calculateRSI(data, period = 14) {
   }
   let avgGain = gains / period;
   let avgLoss = losses / period;
+
   for (let i = period + 1; i < data.length; i++) {
     let change = data[i].close - data[i - 1].close;
     let gain = change > 0 ? change : 0;
@@ -81,14 +92,7 @@ function aiPredictNext(candles, count) {
   return `🤖 AI Prediction for next ${count} candles: <strong>${signal}</strong> (trend: ${trend.toFixed(2)})`;
 }
 
-$('#loadChart').on('click', async function () {
-  const symbol = $('#symbol').val();
-  const interval = intervalMap[$('#timeframe').val()];
-  const candles = await fetchCandles(symbol, interval);
-
-  initChart();
-  candleSeries.setData(candles);
-
+function updateIndicators(candles) {
   const ma25Data = calculateMA(candles, 25);
   const ma50_1Data = calculateMA(candles, 50);
   const ma50_2Data = calculateMA(candles, 50);
@@ -98,15 +102,39 @@ $('#loadChart').on('click', async function () {
   ma50_1.setData(ma50_1Data);
   ma50_2.setData(ma50_2Data);
   rsiSeries.setData(rsiData);
+}
+
+async function handleScroll(range) {
+  if (!range || !range.from) return;
+  const firstVisibleTime = chart.timeScale().getVisibleRange().from;
+  const oldestLoadedTime = fullCandles[0]?.time;
+
+  if (firstVisibleTime <= oldestLoadedTime + 5) {
+    const earliestCandleTimeMs = fullCandles[0].time * 1000;
+    const earlierCandles = await fetchCandles(currentSymbol, currentInterval, 200, null, earliestCandleTimeMs - 1);
+    if (earlierCandles.length > 0) {
+      fullCandles = [...earlierCandles, ...fullCandles];
+      candleSeries.setData(fullCandles);
+      updateIndicators(fullCandles);
+    }
+  }
+}
+
+$('#loadChart').on('click', async function () {
+  currentSymbol = $('#symbol').val();
+  currentInterval = intervalMap[$('#timeframe').val()];
+  const candles = await fetchCandles(currentSymbol, currentInterval, 500);
+  fullCandles = candles;
+
+  initChart();
+  candleSeries.setData(fullCandles);
+  updateIndicators(fullCandles);
   $('#predictionResult').html('');
 });
 
 $('#predict').on('click', async function () {
-  const symbol = $('#symbol').val();
-  const interval = intervalMap[$('#timeframe').val()];
   const count = $('#predictCount').val();
-  const candles = await fetchCandles(symbol, interval);
-  const prediction = aiPredictNext(candles, count);
+  const prediction = aiPredictNext(fullCandles, count);
   $('#predictionResult').html(prediction);
 });
 
