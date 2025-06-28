@@ -25,10 +25,20 @@ function initChart() {
   rsiChart = LightweightCharts.createChart(document.getElementById('rsi-chart'), {
     layout: { backgroundColor: { type: 'solid', color: '#181a20' }, textColor: '#eee' },
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
+    crosshair: {vertLine: {color: '#888',width: 1,style: LightweightCharts.LineStyle.Solid},
+    horzLine: {color: '#888',width: 1,style: LightweightCharts.LineStyle.Solid}},
     timeScale: { timeVisible: true, secondsVisible: false },
   });
 
-  candleSeries = chart.addCandlestickSeries();
+  candleSeries = chart.addCandlestickSeries({
+  upColor: '#26a69a',
+  downColor: '#ef5350',
+  borderUpColor: '#26a69a',
+  borderDownColor: '#ef5350',
+  wickUpColor: '#26a69a',
+  wickDownColor: '#ef5350'
+});
+
   ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 ,priceLineVisible: false, lastValueVisible: false});
   ma50_1 = chart.addLineSeries({ color: 'blue', lineWidth: 1 ,priceLineVisible: false, lastValueVisible: false});
   ma50_2 = chart.addLineSeries({ color: 'blue', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted,priceLineVisible: false, lastValueVisible: false });
