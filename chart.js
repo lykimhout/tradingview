@@ -16,16 +16,14 @@ function initChart() {
     grid: { vertLines: { color: "#444" }, horzLines: { color: "#444" } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
     timeScale: {
-        rightOffset: 5,
-        lockVisibleTimeRangeOnResize: true,
-        autoScroll: false,
-        fixLeftEdge: true
-      }
-
+      rightOffset: 5,
+      lockVisibleTimeRangeOnResize: true
+    }
   });
 
   candleSeries = chart.addCandlestickSeries();
 }
+
 
 function fetchCandles(symbol, interval) {
   const url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
@@ -40,25 +38,21 @@ function fetchCandles(symbol, interval) {
       volume: parseFloat(d[5]),
     }));
 
+    // ✅ Set historical data to chart
     candleSeries.setData(candles);
-    const firstTime = candles[candles.length - 50]?.time || candles[0].time;
-const lastTime = candles[candles.length - 1].time;
 
-chart.timeScale().setVisibleRange({ from: firstTime, to: lastTime });
-
-
-    // ✅ Set the latest candle as base for live updates
+    // ✅ Initialize real-time candle state
     lastCandle = candles[candles.length - 1];
 
+    // ✅ Keep the chart locked on the latest data
+    chart.timeScale().scrollToRealTime();
 
-
-
+    // ✅ Start live updates and countdown
     startRealTimePrice(symbol);
-    startCountdown(interval);
-
-
+    startCountdown(interval); // 🕒 Don't forget this!
   });
 }
+
 
 function startRealTimePrice(symbol) {
   if (priceSocket) {
