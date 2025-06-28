@@ -7,12 +7,13 @@ function initChart() {
   document.getElementById("chart").innerHTML = "";
 
   chart = LightweightCharts.createChart(document.getElementById("chart"), {
-    width: window.innerWidth,
-    height: 500,
-    layout: { backgroundColor: "#0e0e0e", textColor: "#ccc" },
-    grid: { vertLines: { color: "#444" }, horzLines: { color: "#444" } },
-    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-  });
+  width: window.innerWidth,
+  height: 500,
+  layout: { backgroundColor: "#181a20", textColor: "#ccc" },
+  grid: { vertLines: { color: "#444" }, horzLines: { color: "#444" } },
+  crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+});
+
 
   candleSeries = chart.addCandlestickSeries();
 }
