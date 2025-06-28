@@ -8,9 +8,10 @@ const intervalMap = {
   '1d': '1d',
 };
 
-let fullCandles = [];
+let fullCandles = []; // store historical candles
 let currentSymbol = 'BTCUSDT';
 let currentInterval = '1h';
+let earliestTimestamp = null;
 
 function initChart() {
   $('#chart').html('');
@@ -30,24 +31,6 @@ function initChart() {
   ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 ,priceLineVisible: false, lastValueVisible: false});
   ma50_1 = chart.addLineSeries({ color: 'blue', lineWidth: 1 ,priceLineVisible: false, lastValueVisible: false});
   ma50_2 = chart.addLineSeries({ color: 'blue', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted ,priceLineVisible: false, lastValueVisible: false});
-  rsiSeries = rsiChart.addLineSeries({ color: 'orange', lineWidth: 2 });
-
-  chart.timeScale().subscribeVisibleLogicalRangeChange(handleScroll);
-
-    grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
-    timeScale: { timeVisible: true, secondsVisible: false },
-  });
-
-  rsiChart = LightweightCharts.createChart(document.getElementById('rsi-chart'), {
-    layout: { backgroundColor: '#111', textColor: '#eee' },
-    grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
-    timeScale: { timeVisible: true, secondsVisible: false },
-  });
-
-  candleSeries = chart.addCandlestickSeries();
-  ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 });
-  ma50_1 = chart.addLineSeries({ color: 'blue', lineWidth: 1 });
-  ma50_2 = chart.addLineSeries({ color: 'blue', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted });
   rsiSeries = rsiChart.addLineSeries({ color: 'orange', lineWidth: 2 });
 
   chart.timeScale().subscribeVisibleLogicalRangeChange(handleScroll);
@@ -107,21 +90,6 @@ function aiPredictNext(candles, count) {
   return `🤖 AI Prediction for next ${count} candles: <strong>${signal}</strong> (trend: ${trend.toFixed(2)})`;
 }
 
-function generatePredictedCandles(lastCandle, count, intervalSec) {
-  let predicted = [];
-  let base = lastCandle.close;
-  for (let i = 1; i <= count; i++) {
-    const time = lastCandle.time + intervalSec * i;
-    const open = base;
-    const close = base + (Math.random() - 0.5) * base * 0.01;
-    const high = Math.max(open, close) + base * 0.005;
-    const low = Math.min(open, close) - base * 0.005;
-    predicted.push({ time, open, high, low, close });
-    base = close;
-  }
-  return predicted;
-}
-
 function updateIndicators(candles) {
   const ma25Data = calculateMA(candles, 25);
   const ma50_1Data = calculateMA(candles, 50);
@@ -162,21 +130,9 @@ $('#loadChart').on('click', async function () {
 });
 
 $('#predict').on('click', async function () {
-  const count = parseInt($('#predictCount').val());
-  const intervalSec = {
-    '5m': 300,
-    '30m': 1800,
-    '1h': 3600,
-    '4h': 14400,
-    '1d': 86400
-  }[currentInterval];
-
-  const lastCandle = fullCandles[fullCandles.length - 1];
-  const predicted = generatePredictedCandles(lastCandle, count, intervalSec);
-  const allCandles = [...fullCandles, ...predicted];
-
-  candleSeries.setData(allCandles);
-  $('#predictionResult').html(aiPredictNext(fullCandles, count));
+  const count = $('#predictCount').val();
+  const prediction = aiPredictNext(fullCandles, count);
+  $('#predictionResult').html(prediction);
 });
 
 $(document).ready(() => $('#loadChart').click());
