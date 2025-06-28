@@ -4,8 +4,9 @@ let rsiChart, macdChart;
 let drawPoints = [];
 let isDrawingUp = false;
 let isDrawingDown = false;
-let livePriceLine = null;
-let livePriceInterval = null;
+
+let lastCandleTime = null;
+let priceSocket = null;
 
 function initChart() {
   document.getElementById("chart").innerHTML = "";
@@ -37,31 +38,10 @@ function fetchCandles(symbol, interval) {
     candleSeries.setData(candles);
     drawBuySellSignals(candles);
     drawIndicators(candles);
-    startLiveMarketPrice(symbol);
+
+    lastCandleTime = candles[candles.length - 1].time;
+    startRealTimePrice(symbol);
   });
-}
-function startLiveMarketPrice(symbol) {
-  if (livePriceInterval) clearInterval(livePriceInterval);
-
-  livePriceInterval = setInterval(() => {
-    const url = `https://api.binance.me/api/v3/ticker/price?symbol=${symbol}`;
-    $.getJSON(url, function(data) {
-      const price = parseFloat(data.price);
-
-      if (livePriceLine) {
-        candleSeries.removePriceLine(livePriceLine);
-      }
-
-      livePriceLine = candleSeries.createPriceLine({
-        price: price,
-        color: 'yellow',
-        lineWidth: 1,
-        lineStyle: 2, // dashed
-        axisLabelVisible: true,
-        title: 'Live Price'
-      });
-    });
-  }, 1000); // update every second
 }
 
 function drawBuySellSignals(candles) {
@@ -109,7 +89,6 @@ function drawBuySellSignals(candles) {
 }
 
 function drawIndicators(candles) {
-  // Clear previous indicators
   if (emaLine) { chart.removeSeries(emaLine); emaLine = null; }
   if (rsiChart) { document.getElementById("chart").removeChild(rsiChart); rsiChart = null; }
   if (macdChart) { document.getElementById("chart").removeChild(macdChart); macdChart = null; }
@@ -117,7 +96,7 @@ function drawIndicators(candles) {
   const selection = $("#indicator").val();
 
   if (selection === "ema+rsi") {
-    // === EMA ===
+    // EMA
     const emaPeriod = 14;
     const emaData = [];
     let prevEma;
@@ -141,7 +120,7 @@ function drawIndicators(candles) {
     emaLine = chart.addLineSeries({ color: "#FFA500", lineWidth: 1.5 });
     emaLine.setData(emaData.filter(x => x !== null));
 
-    // === RSI ===
+    // RSI
     const rsiValues = calculateRSI(candles, 14);
     const rsiContainer = document.createElement("div");
     rsiContainer.style.width = "100%";
@@ -270,6 +249,27 @@ function calculateMACD(candles, shortPeriod = 12, longPeriod = 26, signalPeriod 
   }
 
   return { macdLine: macdLine.filter(Boolean), signalLine, histogram };
+}
+
+function startRealTimePrice(symbol) {
+  if (priceSocket) {
+    priceSocket.close();
+    priceSocket = null;
+  }
+
+  const streamName = symbol.toLowerCase() + "@trade";
+  priceSocket = new WebSocket(`wss://stream.binance.me:9443/ws/${streamName}`);
+
+  priceSocket.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    const price = parseFloat(data.p);
+    const time = Math.floor(data.T / 1000);
+
+    candleSeries.update({
+      time: time,
+      close: price
+    });
+  };
 }
 
 function handleMouseClick(param) {
