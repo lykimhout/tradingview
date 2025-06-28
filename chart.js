@@ -1,5 +1,3 @@
-
-// Full final chart.js code placed here (from earlier completed answer)
 let chart, candleSeries;
 let emaLine, rsiLine, macdLine, signalLine, macdHistogram;
 let rsiChart, macdChart;
@@ -25,8 +23,28 @@ function initChart() {
   candleSeries = chart.addCandlestickSeries();
 }
 
-// Remaining full code (fetchCandles, drawIndicators, startRealTimePrice, etc.)
-// Due to message length, continued in next step...
+function fetchCandles(symbol, interval) {
+  const url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
+
+  $.getJSON(url, function (data) {
+    const candles = data.map(d => ({
+      time: d[0] / 1000,
+      open: parseFloat(d[1]),
+      high: parseFloat(d[2]),
+      low: parseFloat(d[3]),
+      close: parseFloat(d[4]),
+      volume: parseFloat(d[5]),
+    }));
+
+    candleSeries.setData(candles);
+    drawBuySellSignals(candles);
+    drawIndicators(candles);
+
+    lastCandleTime = candles[candles.length - 1].time;
+    startRealTimePrice(symbol);
+  });
+}
+
 function drawBuySellSignals(candles) {
   const emaPeriod = 10;
   const ema = [];
@@ -72,7 +90,6 @@ function drawBuySellSignals(candles) {
 }
 
 function drawIndicators(candles) {
-  // Clean up existing indicators
   if (emaLine) { chart.removeSeries(emaLine); emaLine = null; }
   if (rsiChart) { document.getElementById("chart").removeChild(rsiChart); rsiChart = null; }
   if (macdChart) { document.getElementById("chart").removeChild(macdChart); macdChart = null; }
@@ -80,7 +97,6 @@ function drawIndicators(candles) {
   const selection = $("#indicator").val();
 
   if (selection === "ema+rsi") {
-    // === EMA ===
     const emaPeriod = 14;
     const emaData = [];
     let prevEma;
@@ -104,7 +120,6 @@ function drawIndicators(candles) {
     emaLine = chart.addLineSeries({ color: "#FFA500", lineWidth: 1.5 });
     emaLine.setData(emaData.filter(x => x !== null));
 
-    // === RSI ===
     const rsiValues = calculateRSI(candles, 14);
     const rsiContainer = document.createElement("div");
     rsiContainer.style.width = "100%";
@@ -148,30 +163,92 @@ function drawIndicators(candles) {
   }
 }
 
-function fetchCandles(symbol, interval) {
-  const url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
+function calculateRSI(candles, period) {
+  const rsi = [];
+  let gains = 0, losses = 0;
 
-  $.getJSON(url, function (data) {
-    const candles = data.map(d => ({
-      time: d[0] / 1000,
-      open: parseFloat(d[1]),
-      high: parseFloat(d[2]),
-      low: parseFloat(d[3]),
-      close: parseFloat(d[4]),
-      volume: parseFloat(d[5]),
-    }));
+  for (let i = 1; i <= period; i++) {
+    const change = candles[i].close - candles[i - 1].close;
+    if (change > 0) gains += change;
+    else losses -= change;
+  }
 
-    candleSeries.setData(candles);
-    drawBuySellSignals(candles);
-    drawIndicators(candles);
+  let avgGain = gains / period;
+  let avgLoss = losses / period;
 
-    lastCandleTime = candles[candles.length - 1].time;
-    startRealTimePrice(symbol);
-  });
+  for (let i = period + 1; i < candles.length; i++) {
+    const change = candles[i].close - candles[i - 1].close;
+    if (change > 0) {
+      avgGain = (avgGain * (period - 1) + change) / period;
+      avgLoss = (avgLoss * (period - 1)) / period;
+    } else {
+      avgGain = (avgGain * (period - 1)) / period;
+      avgLoss = (avgLoss * (period - 1) - change) / period;
+    }
+
+    const rs = avgGain / (avgLoss || 1);
+    const value = 100 - (100 / (1 + rs));
+    rsi.push({ time: candles[i].time, value: Math.round(value * 100) / 100 });
+  }
+
+  return rsi;
 }
 
+function calculateMACD(candles, shortPeriod = 12, longPeriod = 26, signalPeriod = 9) {
+  function ema(data, period) {
+    let result = [];
+    let multiplier = 2 / (period + 1);
+    let prev;
 
+    for (let i = 0; i < data.length; i++) {
+      const close = data[i].close;
+      if (i < period) {
+        result.push(null);
+        continue;
+      }
+      if (!prev) {
+        prev = data.slice(i - period, i).reduce((a, b) => a + b.close, 0) / period;
+      } else {
+        prev = (close - prev) * multiplier + prev;
+      }
+      result.push(prev);
+    }
+    return result;
+  }
 
+  const shortEMA = ema(candles, shortPeriod);
+  const longEMA = ema(candles, longPeriod);
+  const macdLine = [];
+  const signalData = [];
+
+  for (let i = 0; i < candles.length; i++) {
+    if (shortEMA[i] && longEMA[i]) {
+      const macdVal = shortEMA[i] - longEMA[i];
+      macdLine.push({ time: candles[i].time, value: macdVal });
+      signalData.push({ close: macdVal, time: candles[i].time });
+    } else {
+      macdLine.push(null);
+      signalData.push(null);
+    }
+  }
+
+  const signalEMA = ema(signalData, signalPeriod);
+  const signalLine = [];
+  const histogram = [];
+
+  for (let i = 0; i < candles.length; i++) {
+    if (macdLine[i] && signalEMA[i]) {
+      signalLine.push({ time: candles[i].time, value: signalEMA[i] });
+      histogram.push({
+        time: candles[i].time,
+        value: macdLine[i].value - signalEMA[i],
+        color: macdLine[i].value >= signalEMA[i] ? 'green' : 'red'
+      });
+    }
+  }
+
+  return { macdLine: macdLine.filter(Boolean), signalLine, histogram };
+}
 
 function startRealTimePrice(symbol) {
   if (priceSocket) {
@@ -179,7 +256,7 @@ function startRealTimePrice(symbol) {
     priceSocket = null;
   }
 
-  const proxyUrl = 'wss://binance-ws-proxy-me.onrender.com'; // Replace with your Render WebSocket URL
+  const proxyUrl = 'wss://binance-ws-proxy-me.onrender.com'; // Replace this with your working Render WebSocket URL
   priceSocket = new WebSocket(proxyUrl);
 
   let lastCandle = null;
@@ -189,48 +266,45 @@ function startRealTimePrice(symbol) {
   };
 
   priceSocket.onmessage = async function (event) {
-  try {
-    const text = await event.data.text(); // Convert Blob to text
-    const data = JSON.parse(text);        // Parse JSON
+    try {
+      const text = await event.data.text();
+      const data = JSON.parse(text);
 
-    const price = parseFloat(data.p);
-    const volume = parseFloat(data.q);
-    const time = Math.floor(data.T / 1000); // Convert ms to seconds
+      const price = parseFloat(data.p);
+      const volume = parseFloat(data.q);
+      const time = Math.floor(data.T / 1000);
 
-    if (!lastCandle || time > lastCandle.time) {
-      lastCandle = {
-        time: time,
-        open: price,
-        high: price,
-        low: price,
-        close: price,
-        volume: volume
-      };
-    } else {
-      lastCandle.close = price;
-      lastCandle.high = Math.max(lastCandle.high, price);
-      lastCandle.low = Math.min(lastCandle.low, price);
-      lastCandle.volume += volume;
+      if (!lastCandle || time > lastCandle.time) {
+        lastCandle = {
+          time: time,
+          open: price,
+          high: price,
+          low: price,
+          close: price,
+          volume: volume
+        };
+      } else {
+        lastCandle.close = price;
+        lastCandle.high = Math.max(lastCandle.high, price);
+        lastCandle.low = Math.min(lastCandle.low, price);
+        lastCandle.volume += volume;
+      }
+
+      candleSeries.update(lastCandle);
+
+      if (livePriceLine) candleSeries.removePriceLine(livePriceLine);
+      livePriceLine = candleSeries.createPriceLine({
+        price: price,
+        color: 'yellow',
+        lineStyle: 2,
+        axisLabelVisible: true,
+        title: 'Live'
+      });
+    } catch (err) {
+      console.error('WebSocket message error:', err);
     }
-
-    candleSeries.update(lastCandle);
-
-    if (livePriceLine) {
-      candleSeries.removePriceLine(livePriceLine);
-    }
-
-    livePriceLine = candleSeries.createPriceLine({
-      price: price,
-      color: 'yellow',
-      lineStyle: 2,
-      axisLabelVisible: true,
-      title: 'Live'
-    });
-  } catch (err) {
-    console.error('WebSocket message error:', err);
-  }
-};
-
+  };
+}
 
 function handleMouseClick(param) {
   if (!param || !param.time || !param.seriesPrices) return;
