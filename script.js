@@ -17,7 +17,7 @@ function initChart() {
   $('#rsi-chart').html('');
 
   chart = LightweightCharts.createChart(document.getElementById('chart'), {
-    layout: { backgroundColor: { type: 'solid', color: '#181a20' }, textColor: '#eee' },
+    layout: { backgroundColor: { type: 'solid', color: '#181a20' }, textColor: '#ffffff' },
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
     crosshair: {
     vertLine: { color: '#888', width: 1 },
@@ -30,24 +30,24 @@ function initChart() {
   });
 
   rsiChart = LightweightCharts.createChart(document.getElementById('rsi-chart'), {
-    layout: { backgroundColor: { type: 'solid', color: '#181a20' }, textColor: '#eee' },
+    layout: { backgroundColor: { type: 'solid', color: '#181a20' }, textColor: '#ffffff' },
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
     crosshair: {vertLine: {color: '#888',width: 1,style: LightweightCharts.LineStyle.Solid},
     horzLine: {color: '#888',width: 1,style: LightweightCharts.LineStyle.Solid}},
     timeScale: { timeVisible: true, secondsVisible: false },
   });
 
-  candleSeries = chart.addCandlestickSeries({
-  upColor: '#26a69a',
-  downColor: '#ef5350',
-  borderUpColor: '#26a69a',
-  borderDownColor: '#ef5350',
-  wickUpColor: '#26a69a',
-  wickDownColor: '#ef5350',
+
+candleSeries = chart.addCandlestickSeries({
+  upColor: '#00ff00',
+  downColor: '#ff0000',
+  borderUpColor: '#00ff00',
+  borderDownColor: '#ff0000',
+  wickUpColor: '#00ff00',
+  wickDownColor: '#ff0000',
   priceLineVisible: true,
   lastValueVisible: true
 });
-
 
 
   ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 ,priceLineVisible: false, lastValueVisible: false});
