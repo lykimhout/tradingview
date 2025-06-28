@@ -38,16 +38,7 @@ function initChart() {
   });
 
 
-candleSeries = chart.addCandlestickSeries({
-  upColor: '#00ff00',
-  downColor: '#ff0000',
-  borderUpColor: '#00ff00',
-  borderDownColor: '#ff0000',
-  wickUpColor: '#00ff00',
-  wickDownColor: '#ff0000',
-  priceLineVisible: true,
-  lastValueVisible: true
-});
+candleSeries = chart.addCandlestickSeries();
 
 
   ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 ,priceLineVisible: false, lastValueVisible: false});
