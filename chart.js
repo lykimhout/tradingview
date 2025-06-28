@@ -16,9 +16,12 @@ function initChart() {
     grid: { vertLines: { color: "#444" }, horzLines: { color: "#444" } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
     timeScale: {
-      rightOffset: 2,
-      lockVisibleTimeRangeOnResize: true
-    }
+        rightOffset: 5,
+        lockVisibleTimeRangeOnResize: true,
+        autoScroll: false,
+        fixLeftEdge: true
+      }
+
   });
 
   candleSeries = chart.addCandlestickSeries();
@@ -38,6 +41,11 @@ function fetchCandles(symbol, interval) {
     }));
 
     candleSeries.setData(candles);
+    const firstTime = candles[candles.length - 50]?.time || candles[0].time;
+const lastTime = candles[candles.length - 1].time;
+
+chart.timeScale().setVisibleRange({ from: firstTime, to: lastTime });
+
 
     // ✅ Set the latest candle as base for live updates
     lastCandle = candles[candles.length - 1];
