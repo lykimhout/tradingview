@@ -131,34 +131,7 @@ function handleMouseClick(param) {
   }
 }
 
-$(document).ready(function () {
-  initChart();
-  fetchCandles($("#symbol").val(), $("#interval").val());
-
-  $("#symbol, #interval").change(function () {
-    initChart();
-    fetchCandles($("#symbol").val(), $("#interval").val());
-  });
-
-  $("#drawUp").click(function () {
-    isDrawingUp = true;
-    isDrawingDown = false;
-    drawPoints = [];
-  });
-
-  $("#drawDown").click(function () {
-    isDrawingDown = true;
-    isDrawingUp = false;
-    drawPoints = [];
-  });
-    
-
-  setTimeout(() => {
-    chart.subscribeClick(handleMouseClick);
-  }, 500);
-  
-  
-  let countdownInterval;
+let countdownInterval;
 
 function startCountdown(interval) {
   clearInterval(countdownInterval);
@@ -192,5 +165,30 @@ function startCountdown(interval) {
   }, 1000);
 }
 
+$(document).ready(function () {
+  initChart();
+  fetchCandles($("#symbol").val(), $("#interval").val());
+
+  $("#symbol, #interval").change(function () {
+    initChart();
+    fetchCandles($("#symbol").val(), $("#interval").val());
+  });
+
+  $("#drawUp").click(function () {
+    isDrawingUp = true;
+    isDrawingDown = false;
+    drawPoints = [];
+  });
+
+  $("#drawDown").click(function () {
+    isDrawingDown = true;
+    isDrawingUp = false;
+    drawPoints = [];
+  });
+    
+
+  setTimeout(() => {
+    chart.subscribeClick(handleMouseClick);
+  }, 500);      
   
 });
