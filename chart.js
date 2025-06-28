@@ -44,11 +44,12 @@ function fetchCandles(symbol, interval) {
     }));
 
     candleSeries.setData(candles);
-    drawBuySellSignals(candles);
-    drawIndicators(candles);
-    startRealTimePrice(symbol);
 
     lastCandleTime = candles[candles.length - 1].time;
+    
+    drawBuySellSignals(candles);
+    drawIndicators(candles);
+    startRealTimePrice(symbol);    
     startRealTimePrice(symbol);
   });
 }
