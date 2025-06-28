@@ -17,12 +17,7 @@ function initChart() {
     height: 500,
     layout: { backgroundColor: "#181a20", textColor: "#ccc" },
     grid: { vertLines: { color: "#444" }, horzLines: { color: "#444" } },
-    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    timeScale: {
-        rightOffset: 1,
-        fixLeftEdge: true,
-        lockVisibleTimeRangeOnResize: true
-      }
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },    
   });
 
   candleSeries = chart.addCandlestickSeries();
