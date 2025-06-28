@@ -23,6 +23,7 @@ select, button {
 }
 
 #chart {
+  background-color: #181a20;
   width: 100%;
   height: 500px;
 }
