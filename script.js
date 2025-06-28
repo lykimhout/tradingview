@@ -17,7 +17,7 @@ function initChart() {
   $('#rsi-chart').html('');
 
   chart = LightweightCharts.createChart(document.getElementById('chart'), {
-    layout: { backgroundColor: { type: 'solid', color: '#181a20' }, textColor: '#ffffff' },
+    layout: { backgroundColor: { type: 'solid', color: '#181a20' }, textColor: '#eee' },
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
     crosshair: {
     vertLine: { color: '#888', width: 1 },
@@ -30,7 +30,7 @@ function initChart() {
   });
 
   rsiChart = LightweightCharts.createChart(document.getElementById('rsi-chart'), {
-    layout: { backgroundColor: { type: 'solid', color: '#181a20' }, textColor: '#ffffff' },
+    layout: { backgroundColor: { type: 'solid', color: '#181a20' }, textColor: '#eee' },
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
     crosshair: {vertLine: {color: '#888',width: 1,style: LightweightCharts.LineStyle.Solid},
     horzLine: {color: '#888',width: 1,style: LightweightCharts.LineStyle.Solid}},
