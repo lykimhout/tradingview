@@ -4,6 +4,8 @@ let rsiChart, macdChart;
 let drawPoints = [];
 let isDrawingUp = false;
 let isDrawingDown = false;
+let livePriceLine = null;
+let livePriceInterval = null;
 
 function initChart() {
   document.getElementById("chart").innerHTML = "";
@@ -35,7 +37,31 @@ function fetchCandles(symbol, interval) {
     candleSeries.setData(candles);
     drawBuySellSignals(candles);
     drawIndicators(candles);
+    startLiveMarketPrice(symbol);
   });
+}
+function startLiveMarketPrice(symbol) {
+  if (livePriceInterval) clearInterval(livePriceInterval);
+
+  livePriceInterval = setInterval(() => {
+    const url = `https://api.binance.me/api/v3/ticker/price?symbol=${symbol}`;
+    $.getJSON(url, function(data) {
+      const price = parseFloat(data.price);
+
+      if (livePriceLine) {
+        candleSeries.removePriceLine(livePriceLine);
+      }
+
+      livePriceLine = candleSeries.createPriceLine({
+        price: price,
+        color: 'yellow',
+        lineWidth: 1,
+        lineStyle: 2, // dashed
+        axisLabelVisible: true,
+        title: 'Live Price'
+      });
+    });
+  }, 1000); // update every second
 }
 
 function drawBuySellSignals(candles) {
