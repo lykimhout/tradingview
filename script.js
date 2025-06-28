@@ -17,12 +17,12 @@ function initChart() {
   $('#chart').html('');
   $('#rsi-chart').html('');
   chart = LightweightCharts.createChart(document.getElementById('chart'), {
-    layout: { backgroundColor: '#111', textColor: '#eee' },
+    layout: { backgroundColor: '#111', textColor: '#080808' },
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
     timeScale: { timeVisible: true, secondsVisible: false },
   });
   rsiChart = LightweightCharts.createChart(document.getElementById('rsi-chart'), {
-    layout: { backgroundColor: '#111', textColor: '#eee' },
+    layout: { backgroundColor: '#111', textColor: '#080808' },
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
     timeScale: { timeVisible: true, secondsVisible: false },
   });
