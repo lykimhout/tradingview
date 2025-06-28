@@ -94,6 +94,10 @@ function startRealTimePrice(symbol) {
       }
 
       candleSeries.update(lastCandle);
+      chart.timeScale().scrollToRealTime(); // 🔒 keep chart locked
+      // ✅ Visual log to confirm
+      console.log("Updated candle", lastCandle);
+
 
     } catch (err) {
       console.error('WebSocket message error:', err);
