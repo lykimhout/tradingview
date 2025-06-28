@@ -40,9 +40,13 @@ function fetchCandles(symbol, interval) {
     candleSeries.setData(candles);
 
     // ✅ Set the latest candle as base for live updates
-    lastCandle = candles[candles.length - 1];
+     lastCandle = candles[candles.length - 1];
+    drawBuySellSignals(candles);
+    drawIndicators(candles);
 
+    // ✅ Only call this ONCE
     startRealTimePrice(symbol);
+
   });
 }
 
