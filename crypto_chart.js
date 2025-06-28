@@ -4,7 +4,9 @@ let drawing = false, drawMode = false, startPoint = null;
 let rawDataGlobal = [];
 
 async function fetchBinanceData(symbol = 'BTCUSDT', interval = '1m', limit = 100) {
-  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+ // const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+  const url = `https://corsproxy.io/?https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+
   const response = await fetch(url);
   const data = await response.json();
   return data.map(d => ({
