@@ -23,7 +23,7 @@ function initChart() {
 }
 
 function fetchCandles(symbol, interval) {
-  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
+  const url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
 
   $.getJSON(url, function (data) {
     const candles = data.map(d => ({
