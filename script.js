@@ -90,6 +90,21 @@ function aiPredictNext(candles, count) {
   return `🤖 AI Prediction for next ${count} candles: <strong>${signal}</strong> (trend: ${trend.toFixed(2)})`;
 }
 
+function generatePredictedCandles(lastCandle, count, intervalSec) {
+  let predicted = [];
+  let base = lastCandle.close;
+  for (let i = 1; i <= count; i++) {
+    const time = lastCandle.time + intervalSec * i;
+    const open = base;
+    const close = base + (Math.random() - 0.5) * base * 0.01;
+    const high = Math.max(open, close) + base * 0.005;
+    const low = Math.min(open, close) - base * 0.005;
+    predicted.push({ time, open, high, low, close });
+    base = close;
+  }
+  return predicted;
+}
+
 function updateIndicators(candles) {
   const ma25Data = calculateMA(candles, 25);
   const ma50_1Data = calculateMA(candles, 50);
@@ -130,9 +145,21 @@ $('#loadChart').on('click', async function () {
 });
 
 $('#predict').on('click', async function () {
-  const count = $('#predictCount').val();
-  const prediction = aiPredictNext(fullCandles, count);
-  $('#predictionResult').html(prediction);
+  const count = parseInt($('#predictCount').val());
+  const intervalSec = {
+    '5m': 300,
+    '30m': 1800,
+    '1h': 3600,
+    '4h': 14400,
+    '1d': 86400
+  }[currentInterval];
+
+  const lastCandle = fullCandles[fullCandles.length - 1];
+  const predicted = generatePredictedCandles(lastCandle, count, intervalSec);
+  const allCandles = [...fullCandles, ...predicted];
+
+  candleSeries.setData(allCandles);
+  $('#predictionResult').html(aiPredictNext(fullCandles, count));
 });
 
 $(document).ready(() => $('#loadChart').click());
