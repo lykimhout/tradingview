@@ -1,5 +1,5 @@
 body {
-  background: #181a20;
+  background: #111;
   color: #eee;
   font-family: sans-serif;
   padding: 10px;
@@ -12,18 +12,12 @@ body {
 #chart,
 #rsi-chart {
   width: 100%;
-  height: 400px;  
-  position: relative;
+  height: 400px;
 }
 
 #rsi-chart {
   height: 150px;
   margin-top: 20px;
-}
-
-#chart canvas,
-#rsi-chart canvas {
-  
 }
 
 select,
