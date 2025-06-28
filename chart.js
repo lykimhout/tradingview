@@ -18,6 +18,11 @@ function initChart() {
     layout: { backgroundColor: "#181a20", textColor: "#ccc" },
     grid: { vertLines: { color: "#444" }, horzLines: { color: "#444" } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    timeScale: {
+        rightOffset: 1,
+        fixLeftEdge: true,
+        lockVisibleTimeRangeOnResize: true
+      }
   });
 
   candleSeries = chart.addCandlestickSeries();
@@ -291,6 +296,7 @@ function startRealTimePrice(symbol) {
       }
 
       candleSeries.update(lastCandle);
+
 
       if (livePriceLine) candleSeries.removePriceLine(livePriceLine);
       livePriceLine = candleSeries.createPriceLine({
