@@ -39,6 +39,7 @@ function initChart() {
   wickDownColor: '#ef5350'
 });
 
+
   ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 ,priceLineVisible: false, lastValueVisible: false});
   ma50_1 = chart.addLineSeries({ color: 'blue', lineWidth: 1 ,priceLineVisible: false, lastValueVisible: false});
   ma50_2 = chart.addLineSeries({ color: 'blue', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted,priceLineVisible: false, lastValueVisible: false });
