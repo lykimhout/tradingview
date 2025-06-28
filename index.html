@@ -1,50 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />  
+  <meta charset="UTF-8" />
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <title>Candlestick Chart with Analysis</title>
+  <title>Real-Time Crypto Chart</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="controls">
     <select id="symbol">
-  <option value="BTCUSDT">BTC/USDT</option>
-  <option value="ETHUSDT">ETH/USDT</option>
-  <option value="SUIUSDT">SUI/USDT</option>
-  <option value="BNBUSDT">BNB/USDT</option>
-  <option value="SOLUSDT">SOL/USDT</option>
-  <option value="WIFUSDT">WIF/USDT</option>
-  <option value="LTCUSDT">LTC/USDT</option>
-  <option value="XRPUSDT">XRP/USDT</option>
-  <option value="TONUSDT">TON/USDT</option>
-</select>
+      <option value="BTCUSDT" selected>BTC/USDT</option>
+      <option value="ETHUSDT">ETH/USDT</option>
+      <option value="SUIUSDT">SUI/USDT</option>
+      <option value="BNBUSDT">BNB/USDT</option>
+      <option value="SOLUSDT">SOL/USDT</option>
+      <option value="WIFUSDT">WIF/USDT</option>
+      <option value="LTCUSDT">LTC/USDT</option>
+      <option value="XRPUSDT">XRP/USDT</option>
+      <option value="TONUSDT">TON/USDT</option>
+    </select>
 
-<select id="interval">
-  <option value="1m">1 Minute</option>
-  <option value="5m">5 Minute</option>
-  <option value="15m">15 Minute</option>
-  <option value="30m">30 Minute</option>
-  <option value="1h" selected>1 Hour</option>
-  <option value="1d">1 Day</option>
-</select>
-<select id="indicator">
-    <option value="">None</option>
-    <option value="ema+rsi">EMA + RSI</option>
-    <option value="macd">MACD</option>
-  </select>
+    <select id="interval">
+      <option value="1m">1 Minute</option>
+      <option value="5m">5 Minute</option>
+      <option value="15m">15 Minute</option>
+      <option value="30m">30 Minute</option>
+      <option value="1h" selected>1 Hour</option>
+      <option value="1d">1 Day</option>
+    </select>
+
+    <select id="indicator">
+      <option value="">None</option>
+      <option value="ema+rsi">EMA + RSI</option>
+      <option value="macd">MACD</option>
+    </select>
+
     <button id="drawUp">Draw Up Line</button>
     <button id="drawDown">Draw Down Line</button>
   </div>
 
   <div id="chart"></div>
 
-  <!-- jQuery and Chart Library -->
+  <!-- Dependencies -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
-  
-
-  <!-- Chart logic -->
   <script src="chart.js"></script>
 </body>
 </html>
