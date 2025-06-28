@@ -1,4 +1,6 @@
 let chart, candleSeries;
+let emaLine, rsiLine, macdLine, signalLine, macdHistogram;
+let rsiChart, macdChart;
 let drawPoints = [];
 let isDrawingUp = false;
 let isDrawingDown = false;
@@ -7,19 +9,18 @@ function initChart() {
   document.getElementById("chart").innerHTML = "";
 
   chart = LightweightCharts.createChart(document.getElementById("chart"), {
-  width: window.innerWidth,
-  height: 500,
-  layout: { backgroundColor: "#181a20", textColor: "#ccc" },
-  grid: { vertLines: { color: "#444" }, horzLines: { color: "#444" } },
-  crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-});
-
+    width: window.innerWidth,
+    height: 500,
+    layout: { backgroundColor: "#181a20", textColor: "#ccc" },
+    grid: { vertLines: { color: "#444" }, horzLines: { color: "#444" } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+  });
 
   candleSeries = chart.addCandlestickSeries();
 }
 
 function fetchCandles(symbol, interval) {
-  const url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
+  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
 
   $.getJSON(url, function(data) {
     const candles = data.map(d => ({
@@ -28,10 +29,12 @@ function fetchCandles(symbol, interval) {
       high: parseFloat(d[2]),
       low: parseFloat(d[3]),
       close: parseFloat(d[4]),
+      volume: parseFloat(d[5]),
     }));
 
     candleSeries.setData(candles);
     drawBuySellSignals(candles);
+    drawIndicators(candles);
   });
 }
 
@@ -54,7 +57,6 @@ function drawBuySellSignals(candles) {
   for (let i = emaPeriod + 1; i < candles.length; i++) {
     const prevClose = candles[i - 1].close;
     const currClose = candles[i].close;
-
     const prevEma = ema[i - 1];
     const currEma = ema[i];
 
@@ -80,53 +82,12 @@ function drawBuySellSignals(candles) {
   candleSeries.setMarkers(markers);
 }
 
-function handleMouseClick(param) {
-  if (!param || !param.time || !param.seriesPrices) return;
+function drawIndicators(candles) {
+  // Clear previous indicators
+  if (emaLine) { chart.removeSeries(emaLine); emaLine = null; }
+  if (rsiChart) { document.getElementById("chart").removeChild(rsiChart); rsiChart = null; }
+  if (macdChart) { document.getElementById("chart").removeChild(macdChart); macdChart = null; }
 
-  drawPoints.push(param);
+  const selection = $("#indicator").val();
 
-  if (drawPoints.length === 2) {
-    const price1 = param.seriesPrices.get(candleSeries).close;
-    const price0 = drawPoints[0].seriesPrices.get(candleSeries).close;
-
-    const lineSeries = chart.addLineSeries({
-      color: isDrawingUp ? "lime" : "red",
-      lineWidth: 2,
-    });
-
-    lineSeries.setData([
-      { time: drawPoints[0].time, value: price0 },
-      { time: drawPoints[1].time, value: price1 }
-    ]);
-
-    drawPoints = [];
-    isDrawingUp = false;
-    isDrawingDown = false;
-  }
-}
-
-$(document).ready(function() {
-  initChart();
-  fetchCandles($("#symbol").val(), $("#interval").val());
-
-  $("#symbol, #interval").change(function() {
-    initChart();
-    fetchCandles($("#symbol").val(), $("#interval").val());
-  });
-
-  $("#drawUp").click(function() {
-    isDrawingUp = true;
-    isDrawingDown = false;
-    drawPoints = [];
-  });
-
-  $("#drawDown").click(function() {
-    isDrawingDown = true;
-    isDrawingUp = false;
-    drawPoints = [];
-  });
-
-  setTimeout(() => {
-    chart.subscribeClick(handleMouseClick);
-  }, 500);
-});
+  if (selection === "em
