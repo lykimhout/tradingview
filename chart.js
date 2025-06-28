@@ -3,8 +3,8 @@ let isDrawingUp = false, isDrawingDown = false;
 let drawPoints = [];
 
 function initChart() {
-  $("#chart").empty();
-  chart = LightweightCharts.createChart(document.getElementById("chart"), {
+  $("#chart").empty();  
+  chart = createChart(document.getElementById("chart"), {
     width: window.innerWidth,
     height: 500,
     layout: { backgroundColor: "#111", textColor: "#eee" },
