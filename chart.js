@@ -188,40 +188,42 @@ function startRealTimePrice(symbol) {
     priceSocket.send(symbol);
   };
 
-  priceSocket.onmessage = function (event) {
-    const data = JSON.parse(event.data);
-    const price = parseFloat(data.p);
-    const volume = parseFloat(data.q);
-    const time = Math.floor(data.T / 1000);
+  priceSocket.onmessage = async function (event) {
+  const text = await event.data.text(); // convert Blob to string
+  const data = JSON.parse(text);        // now parse safely
 
-    if (!lastCandle || time > lastCandle.time) {
-      lastCandle = {
-        time: time,
-        open: price,
-        high: price,
-        low: price,
-        close: price,
-        volume: volume
-      };
-    } else {
-      lastCandle.close = price;
-      lastCandle.high = Math.max(lastCandle.high, price);
-      lastCandle.low = Math.min(lastCandle.low, price);
-      lastCandle.volume += volume;
-    }
+  const price = parseFloat(data.p);
+  const volume = parseFloat(data.q);
+  const time = Math.floor(data.T / 1000);
 
-    candleSeries.update(lastCandle);
+  if (!lastCandle || time > lastCandle.time) {
+    lastCandle = {
+      time: time,
+      open: price,
+      high: price,
+      low: price,
+      close: price,
+      volume: volume
+    };
+  } else {
+    lastCandle.close = price;
+    lastCandle.high = Math.max(lastCandle.high, price);
+    lastCandle.low = Math.min(lastCandle.low, price);
+    lastCandle.volume += volume;
+  }
 
-    if (livePriceLine) candleSeries.removePriceLine(livePriceLine);
-    livePriceLine = candleSeries.createPriceLine({
-      price: price,
-      color: 'yellow',
-      lineStyle: 2,
-      axisLabelVisible: true,
-      title: 'Live'
-    });
-  };
-}
+  candleSeries.update(lastCandle);
+
+  if (livePriceLine) candleSeries.removePriceLine(livePriceLine);
+  livePriceLine = candleSeries.createPriceLine({
+    price: price,
+    color: 'yellow',
+    lineStyle: 2,
+    axisLabelVisible: true,
+    title: 'Live'
+  });
+};
+
 
 function handleMouseClick(param) {
   if (!param || !param.time || !param.seriesPrices) return;
