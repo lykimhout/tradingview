@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Candlestick Chart</title>
+  <title>Candlestick Chart with Analysis</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -16,18 +15,18 @@
       <option value="1m">1 Minute</option>
       <option value="5m">5 Minute</option>
       <option value="15m">15 Minute</option>
-      <option value="30m">30 Minute</option>
-      <option value="1h">1 Hour</option>
-      <option value="4h">4 Hours</option>
-      <option value="1d">1 Day</option>      
     </select>
     <button id="drawUp">Draw Up Line</button>
     <button id="drawDown">Draw Down Line</button>
   </div>
-  <div id="chart"></div>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.js"></script>
-  <script src="chart.js"></script>
 
+  <div id="chart"></div>
+
+  <!-- jQuery and Chart Library -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+
+  <!-- Chart logic -->
+  <script src="chart.js"></script>
 </body>
 </html>
