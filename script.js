@@ -19,6 +19,13 @@ function initChart() {
   chart = LightweightCharts.createChart(document.getElementById('chart'), {
     layout: { backgroundColor: { type: 'solid', color: '#181a20' }, textColor: '#eee' },
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
+    crosshair: {
+    vertLine: { color: '#888', width: 1 },
+    horzLine: { color: '#888', width: 1 }
+  },
+  rightPriceScale: {
+    borderColor: '#555'
+  },
     timeScale: { timeVisible: true, secondsVisible: false },
   });
 
@@ -36,8 +43,11 @@ function initChart() {
   borderUpColor: '#26a69a',
   borderDownColor: '#ef5350',
   wickUpColor: '#26a69a',
-  wickDownColor: '#ef5350'
+  wickDownColor: '#ef5350',
+  priceLineVisible: true,
+  lastValueVisible: true
 });
+
 
 
   ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 ,priceLineVisible: false, lastValueVisible: false});
