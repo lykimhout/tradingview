@@ -299,13 +299,13 @@ function startRealTimePrice(symbol) {
 
 
       if (livePriceLine) candleSeries.removePriceLine(livePriceLine);
-      livePriceLine = candleSeries.createPriceLine({
-        price: price,
-        color: 'yellow',
-        lineStyle: 2,
-        axisLabelVisible: true,
-        title: 'Live'
-      });
+livePriceLine = candleSeries.createPriceLine({
+  price: price,
+  color: 'yellow',
+  lineStyle: 2,
+  axisLabelVisible: true,
+  title: 'Live'
+});
     } catch (err) {
       console.error('WebSocket message error:', err);
     }
