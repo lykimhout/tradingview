@@ -30,7 +30,7 @@ function initChart() {
 }
 
 async function fetchCandles(symbol, interval) {
-  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
+  const url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
   const response = await fetch(url);
   const data = await response.json();
   return data.map(d => ({
