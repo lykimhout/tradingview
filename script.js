@@ -8,49 +8,36 @@ const intervalMap = {
   '1d': '1d',
 };
 
-let fullCandles = [];
+let fullCandles = []; // store historical candles
 let currentSymbol = 'BTCUSDT';
 let currentInterval = '1h';
+let earliestTimestamp = null;
 
 function initChart() {
   $('#chart').html('');
   $('#rsi-chart').html('');
-
   chart = LightweightCharts.createChart(document.getElementById('chart'), {
     layout: { backgroundColor: '#111', textColor: '#eee' },
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
-    crosshair: {
-    vertLine: { color: '#888', width: 1 },
-    horzLine: { color: '#888', width: 1 }
-  },
-  rightPriceScale: {
-    borderColor: '#555'
-  },
     timeScale: { timeVisible: true, secondsVisible: false },
   });
-
   rsiChart = LightweightCharts.createChart(document.getElementById('rsi-chart'), {
     layout: { backgroundColor: '#111', textColor: '#eee' },
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
-    crosshair: {vertLine: {color: '#888',width: 1,style: LightweightCharts.LineStyle.Solid},
-    horzLine: {color: '#888',width: 1,style: LightweightCharts.LineStyle.Solid}},
     timeScale: { timeVisible: true, secondsVisible: false },
   });
 
-
-candleSeries = chart.addCandlestickSeries();
-
-
-  ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 ,priceLineVisible: false, lastValueVisible: false});
-  ma50_1 = chart.addLineSeries({ color: 'blue', lineWidth: 1 ,priceLineVisible: false, lastValueVisible: false});
-  ma50_2 = chart.addLineSeries({ color: 'blue', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted,priceLineVisible: false, lastValueVisible: false });
-  rsiSeries = rsiChart.addLineSeries({ color: 'orange', lineWidth: 2 ,priceLineVisible: false, lastValueVisible: false});
+  candleSeries = chart.addCandlestickSeries();
+  ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 });
+  ma50_1 = chart.addLineSeries({ color: 'blue', lineWidth: 1 });
+  ma50_2 = chart.addLineSeries({ color: 'blue', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted });
+  rsiSeries = rsiChart.addLineSeries({ color: 'orange', lineWidth: 2 });
 
   chart.timeScale().subscribeVisibleLogicalRangeChange(handleScroll);
 }
 
 async function fetchCandles(symbol, interval, limit = 500, endTime = null, startTime = null) {
-  let url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+  let url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
   if (endTime) url += `&endTime=${endTime}`;
   if (startTime) url += `&startTime=${startTime}`;
   const response = await fetch(url);
@@ -83,7 +70,6 @@ function calculateRSI(data, period = 14) {
   }
   let avgGain = gains / period;
   let avgLoss = losses / period;
-
   for (let i = period + 1; i < data.length; i++) {
     let change = data[i].close - data[i - 1].close;
     let gain = change > 0 ? change : 0;
@@ -109,7 +95,6 @@ function updateIndicators(candles) {
   const ma50_1Data = calculateMA(candles, 50);
   const ma50_2Data = calculateMA(candles, 50);
   const rsiData = calculateRSI(candles);
-
   ma25.setData(ma25Data);
   ma50_1.setData(ma50_1Data);
   ma50_2.setData(ma50_2Data);
