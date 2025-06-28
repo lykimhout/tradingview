@@ -33,7 +33,7 @@ function initChart() {
   rsiSeries = rsiChart.addLineSeries({ color: 'orange', lineWidth: 2 });
 
   chart.timeScale().subscribeVisibleLogicalRangeChange(handleScroll);
-},
+
     grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
     timeScale: { timeVisible: true, secondsVisible: false },
   });
@@ -54,7 +54,7 @@ function initChart() {
 }
 
 async function fetchCandles(symbol, interval, limit = 500, endTime = null, startTime = null) {
-  let url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+  let url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
   if (endTime) url += `&endTime=${endTime}`;
   if (startTime) url += `&startTime=${startTime}`;
   const response = await fetch(url);
