@@ -23,9 +23,9 @@ function initChart() {
 }
 
 function fetchCandles(symbol, interval) {
-  const url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
+  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
 
-  $.getJSON(url, function(data) {
+  $.getJSON(url, function (data) {
     const candles = data.map(d => ({
       time: d[0] / 1000,
       open: parseFloat(d[1]),
@@ -96,7 +96,7 @@ function drawIndicators(candles) {
   const selection = $("#indicator").val();
 
   if (selection === "ema+rsi") {
-    // EMA
+    // === EMA ===
     const emaPeriod = 14;
     const emaData = [];
     let prevEma;
@@ -120,7 +120,7 @@ function drawIndicators(candles) {
     emaLine = chart.addLineSeries({ color: "#FFA500", lineWidth: 1.5 });
     emaLine.setData(emaData.filter(x => x !== null));
 
-    // RSI
+    // === RSI ===
     const rsiValues = calculateRSI(candles, 14);
     const rsiContainer = document.createElement("div");
     rsiContainer.style.width = "100%";
@@ -257,11 +257,11 @@ function startRealTimePrice(symbol) {
     priceSocket = null;
   }
 
-  const socketUrl = 'wss://binance-ws-proxy-zcno.onrender.com'; // e.g., wss://binance-ws.onrender.com
-  priceSocket = new WebSocket(socketUrl);
+  const proxyUrl = 'wss://binance-ws-proxy-zcno.onrender.com'; // <- Replace with your Render WebSocket URL
+  priceSocket = new WebSocket(proxyUrl);
 
   priceSocket.onopen = () => {
-    priceSocket.send(symbol); // e.g., BTCUSDT
+    priceSocket.send(symbol);
   };
 
   priceSocket.onmessage = function (event) {
@@ -275,7 +275,6 @@ function startRealTimePrice(symbol) {
     });
   };
 }
-
 
 function handleMouseClick(param) {
   if (!param || !param.time || !param.seriesPrices) return;
