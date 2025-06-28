@@ -2,48 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Crypto Chart with Indicators</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <title>Real-Time Crypto Chart</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
-  <div class="controls">
+
+<div id="controls">
+  <label>Symbol:
     <select id="symbol">
-      <option value="BTCUSDT" selected>BTC/USDT</option>
-      <option value="ETHUSDT">ETH/USDT</option>
-      <option value="SUIUSDT">SUI/USDT</option>
-      <option value="BNBUSDT">BNB/USDT</option>
-      <option value="SOLUSDT">SOL/USDT</option>
-      <option value="WIFUSDT">WIF/USDT</option>
-      <option value="LTCUSDT">LTC/USDT</option>
-      <option value="XRPUSDT">XRP/USDT</option>
-      <option value="TONUSDT">TON/USDT</option>
+      <option value="BTCUSDT">BTC</option>
+      <option value="ETHUSDT">ETH</option>
+      <option value="BNBUSDT">BNB</option>
+      <option value="SOLUSDT">SOL</option>
+      <option value="SUIUSDT">SUI</option>
+      <option value="XRPUSDT">XRP</option>
+      <option value="LTCUSDT">LTC</option>
+      <option value="TONUSDT">TON</option>
+      <option value="WIFUSDT">WIF</option>
     </select>
+  </label>
 
-    <select id="interval">
-      <option value="1m">1 Minute</option>
-      <option value="5m">5 Minute</option>
-      <option value="15m">15 Minute</option>
-      <option value="30m">30 Minute</option>
-      <option value="1h" selected>1 Hour</option>
-      <option value="1d">1 Day</option>
+  <label>Timeframe:
+    <select id="timeframe">
+      <option value="5m">5m</option>
+      <option value="30m">30m</option>
+      <option value="1h">1H</option>
+      <option value="4h">4H</option>
+      <option value="1d">1D</option>
     </select>
+  </label>
 
-    <select id="indicator">
-      <option value="">None</option>
-      <option value="ema+rsi">EMA + RSI</option>
-      <option value="macd">MACD</option>
+  <label>Predict:
+    <select id="predictCount">
+      <option value="10">Next 10</option>
+      <option value="20">Next 20</option>
+      <option value="30">Next 30</option>
     </select>
+  </label>
 
-    <button id="drawUp">Draw Up Line</button>
-    <button id="drawDown">Draw Down Line</button>
-  </div>
+  <button id="loadChart">Load</button>
+  <button id="predict">Predict</button>
+</div>
 
-  <div id="chart"></div>
+<div id="chart"></div>
+<div id="rsi-chart"></div>
+<div id="predictionResult"></div>
 
-  <!-- Dependencies -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
-  <script src="chart.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
