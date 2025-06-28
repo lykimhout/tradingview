@@ -189,39 +189,46 @@ function startRealTimePrice(symbol) {
   };
 
   priceSocket.onmessage = async function (event) {
-  const text = await event.data.text(); // convert Blob to string
-  const data = JSON.parse(text);        // now parse safely
+  try {
+    const text = await event.data.text(); // Convert Blob to text
+    const data = JSON.parse(text);        // Parse JSON
 
-  const price = parseFloat(data.p);
-  const volume = parseFloat(data.q);
-  const time = Math.floor(data.T / 1000);
+    const price = parseFloat(data.p);
+    const volume = parseFloat(data.q);
+    const time = Math.floor(data.T / 1000); // Convert ms to seconds
 
-  if (!lastCandle || time > lastCandle.time) {
-    lastCandle = {
-      time: time,
-      open: price,
-      high: price,
-      low: price,
-      close: price,
-      volume: volume
-    };
-  } else {
-    lastCandle.close = price;
-    lastCandle.high = Math.max(lastCandle.high, price);
-    lastCandle.low = Math.min(lastCandle.low, price);
-    lastCandle.volume += volume;
+    if (!lastCandle || time > lastCandle.time) {
+      lastCandle = {
+        time: time,
+        open: price,
+        high: price,
+        low: price,
+        close: price,
+        volume: volume
+      };
+    } else {
+      lastCandle.close = price;
+      lastCandle.high = Math.max(lastCandle.high, price);
+      lastCandle.low = Math.min(lastCandle.low, price);
+      lastCandle.volume += volume;
+    }
+
+    candleSeries.update(lastCandle);
+
+    if (livePriceLine) {
+      candleSeries.removePriceLine(livePriceLine);
+    }
+
+    livePriceLine = candleSeries.createPriceLine({
+      price: price,
+      color: 'yellow',
+      lineStyle: 2,
+      axisLabelVisible: true,
+      title: 'Live'
+    });
+  } catch (err) {
+    console.error('WebSocket message error:', err);
   }
-
-  candleSeries.update(lastCandle);
-
-  if (livePriceLine) candleSeries.removePriceLine(livePriceLine);
-  livePriceLine = candleSeries.createPriceLine({
-    price: price,
-    color: 'yellow',
-    lineStyle: 2,
-    axisLabelVisible: true,
-    title: 'Live'
-  });
 };
 
 
