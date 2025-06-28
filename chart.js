@@ -258,7 +258,7 @@ function startRealTimePrice(symbol) {
   }
 
   const streamName = symbol.toLowerCase() + "@trade";
-  priceSocket = new WebSocket(`wss://stream.binance.me:9443/ws/${streamName}`);
+  priceSocket = new WebSocket(`wss://stream.binance.com:9443/ws/${streamName}`);
 
   priceSocket.onmessage = function (event) {
     const data = JSON.parse(event.data);
