@@ -5,7 +5,7 @@ let rawDataGlobal = [];
 
 async function fetchBinanceData(symbol = 'BTCUSDT', interval = '1m', limit = 100) {
   //const url = `https://api.binance.me/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
-  const url = `https://binance-proxy.onrender.com/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;  
+  const url = `https://binance-proxy-5t7v.onrender.com/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;  
 
   const response = await fetch(url);
   const data = await response.json();
