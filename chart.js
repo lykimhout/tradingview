@@ -257,8 +257,12 @@ function startRealTimePrice(symbol) {
     priceSocket = null;
   }
 
-  const streamName = symbol.toLowerCase() + "@trade";
-  priceSocket = new WebSocket(`wss://stream.binance.com:9443/ws/${streamName}`);
+  const socketUrl = 'wss://binance-ws-proxy-zcno.onrender.com'; // e.g., wss://binance-ws.onrender.com
+  priceSocket = new WebSocket(socketUrl);
+
+  priceSocket.onopen = () => {
+    priceSocket.send(symbol); // e.g., BTCUSDT
+  };
 
   priceSocket.onmessage = function (event) {
     const data = JSON.parse(event.data);
@@ -271,6 +275,7 @@ function startRealTimePrice(symbol) {
     });
   };
 }
+
 
 function handleMouseClick(param) {
   if (!param || !param.time || !param.seriesPrices) return;
