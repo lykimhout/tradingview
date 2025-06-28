@@ -28,9 +28,9 @@ function initChart() {
   });
 
   candleSeries = chart.addCandlestickSeries();
-  ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 });
-  ma50_1 = chart.addLineSeries({ color: 'blue', lineWidth: 1 });
-  ma50_2 = chart.addLineSeries({ color: 'blue', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted });
+  ma25 = chart.addLineSeries({ color: 'yellow', lineWidth: 2 ,priceLineVisible: false, lastValueVisible: false});
+  ma50_1 = chart.addLineSeries({ color: 'blue', lineWidth: 1 ,priceLineVisible: false, lastValueVisible: false});
+  ma50_2 = chart.addLineSeries({ color: 'blue', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted ,priceLineVisible: false, lastValueVisible: false});
   rsiSeries = rsiChart.addLineSeries({ color: 'orange', lineWidth: 2 });
 
   chart.timeScale().subscribeVisibleLogicalRangeChange(handleScroll);
