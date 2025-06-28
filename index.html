@@ -28,7 +28,11 @@
   <option value="1h" selected>1 Hour</option>
   <option value="1d">1 Day</option>
 </select>
-
+<select id="indicator">
+    <option value="">None</option>
+    <option value="ema+rsi">EMA + RSI</option>
+    <option value="macd">MACD</option>
+  </select>
     <button id="drawUp">Draw Up Line</button>
     <button id="drawDown">Draw Down Line</button>
   </div>
@@ -38,6 +42,7 @@
   <!-- jQuery and Chart Library -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+  
 
   <!-- Chart logic -->
   <script src="chart.js"></script>
